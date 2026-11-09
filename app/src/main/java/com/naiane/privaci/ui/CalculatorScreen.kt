@@ -41,11 +41,7 @@ fun CalculatorScreen(store: PasswordStore, onUnlock: () -> Unit) {
             "C" -> { expr = ""; result = ""; justEvaluated = false }
             "⌫" -> { expr = expr.dropLast(1); result = ""; justEvaluated = false }
             "=" -> {
-                // Só números digitados + "=" -> confere se é a senha privada
-                if (expr.length >= 4 && expr.all { it.isDigit() } && store.verify(expr)) {
-                    expr = ""; result = ""; justEvaluated = false
-                    onUnlock()
-                } else if (expr.isNotEmpty()) {
+                if (expr.isNotEmpty()) {
                     val r = CalculatorEngine.evaluate(expr)
                     if (r == null) {
                         result = "Erro"
@@ -74,6 +70,16 @@ fun CalculatorScreen(store: PasswordStore, onUnlock: () -> Unit) {
                     expr += key
                 }
                 justEvaluated = false
+
+                // Entrada automática: se os 8 últimos números digitados forem a senha, abre sozinho
+                if (key[0].isDigit()) {
+                    val tail = expr.takeLast(8)
+                    if (tail.length == 8 && tail.all { it.isDigit() } && store.verify(tail)) {
+                        expr = ""
+                        result = ""
+                        onUnlock()
+                    }
+                }
             }
         }
     }
