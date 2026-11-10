@@ -42,7 +42,7 @@ fun SetupScreen(store: PasswordStore, onDone: () -> Unit) {
         Text("Criar senha privada", color = NeonGreen, fontSize = 26.sp)
         Spacer(Modifier.height(8.dp))
         Text(
-            "Escolha uma senha numérica (mínimo 4 números). Depois, digite essa senha na calculadora e aperte = para entrar.",
+            "Escolha uma senha com exatamente 8 números. Depois, digite essa senha na calculadora para entrar.",
             color = Color.White,
             fontSize = 14.sp
         )
@@ -50,8 +50,8 @@ fun SetupScreen(store: PasswordStore, onDone: () -> Unit) {
 
         OutlinedTextField(
             value = first,
-            onValueChange = { first = it.filter(Char::isDigit) },
-            label = { Text("Senha") },
+            onValueChange = { first = it.filter(Char::isDigit).take(8) },
+            label = { Text("Senha (8 números)") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
@@ -60,7 +60,7 @@ fun SetupScreen(store: PasswordStore, onDone: () -> Unit) {
         Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = second,
-            onValueChange = { second = it.filter(Char::isDigit) },
+            onValueChange = { second = it.filter(Char::isDigit).take(8) },
             label = { Text("Repita a senha") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
@@ -77,7 +77,7 @@ fun SetupScreen(store: PasswordStore, onDone: () -> Unit) {
         Button(
             onClick = {
                 when {
-                    first.length < 4 -> error = "A senha precisa ter pelo menos 4 números."
+                    first.length != 8 -> error = "A senha precisa ter exatamente 8 números."
                     first != second -> error = "As senhas não são iguais."
                     else -> {
                         store.save(first)
